@@ -1,5 +1,5 @@
 const main = document.querySelector('main')
-const text = document.getElementById('text')
+const textarea = document.getElementById('text')
 const voicesSelect = document.getElementById('voices')
 const readBtn= document.getElementById('read')
 const toggleBtn = document.getElementById('toggle')
@@ -72,6 +72,78 @@ function createBox(item) {
         <p class="info">${text}</p>
     `;
     //speakevent
+    box.addEventListener('click', () => {
+      setTextMessage(text)
+      speakText()
+
+      //active effect
+      box.classList.add('active')
+      setTimeout(()=> box.classList.remove('active'), 800)
+
+
+    })
+
+
+
+
     main.appendChild(box)
 
 }
+//initialize speech synth
+const message = new SpeechSynthesisUtterance()
+
+//store voices array
+let voices=[]
+
+function getVoices() {
+    voices = speechSynthesis.getVoices();
+    voices.forEach(voice => {
+        const option = document.createElement('option')
+        option.value = voice.name
+        option.innerText =`
+            ${voice.name} ${voice.lang}
+        `
+        voicesSelect.appendChild(option)
+    })
+}
+//settext
+function setTextMessage(text) {
+  message.text = text
+}
+
+//speaking text
+function speakText(){
+  speechSynthesis.speak(message)
+}
+
+
+//set voice
+function setVoice(e){
+  message.voice = voices.find(voice => voice.name === e.target.value)
+}
+
+
+//changed voice
+speechSynthesis.addEventListener('voiceschanged', getVoices)
+
+
+// toggle box 
+toggleBtn.addEventListener('click', () => 
+document.getElementById('text-box').classList.toggle('show'))
+
+// close button 
+closeBtn.addEventListener('click', () => 
+document.getElementById('text-box').classList.remove('show'))
+
+
+
+//chnnge voise
+voicesSelect.addEventListener('change', setVoice)
+
+//read text button
+readBtn.addEventListener('click', ()=> {
+  setTextMessage(textarea.value)
+  speakText()
+})
+
+getVoices()
